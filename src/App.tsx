@@ -1,52 +1,50 @@
 import './App.css';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { v4 as uuid } from 'uuid';
 
-import logo from './logo.svg';
+import { Item } from './components/note/item';
+import { Note } from './types';
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [note, setNote] = useState<string>('');
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNote(event.target.value);
+  };
+
+  const clearInput = () => {
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+  };
+
+  const handleAddClick = () => {
+    if (note) {
+      setNotes([...notes, { data: note, id: uuid() }]);
+      setNote('');
+    }
+
+    clearInput();
+  };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p className="header">
-          🚀 Vite + React + Typescript 🤘 & <br />
-          Eslint 🔥+ Prettier
-        </p>
-
-        <div className="body">
-          <button onClick={() => setCount((count) => count + 1)}>
-            🪂 Click me : {count}
-          </button>
-
-          <p> Don&apos;t forgot to install Eslint and Prettier in Your Vscode.</p>
-
-          <p>
-            Mess up the code in <code>App.tsx </code> and save the file.
-          </p>
-          <p>
-            <a
-              className="App-link"
-              href="https://reactjs.org"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learn React
-            </a>
-            {' | '}
-            <a
-              className="App-link"
-              href="https://vitejs.dev/guide/features.html"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Vite Docs
-            </a>
-          </p>
-        </div>
-      </header>
+    <div className="main-container">
+      <input
+        className="note-input"
+        placeholder="Enter your note"
+        onChange={handleInputChange}
+        ref={inputRef}
+      />
+      <button className="add-button" onClick={handleAddClick}>
+        Add Note
+      </button>
+      {notes.map((props) => (
+        <Item {...props} key={props.id} />
+      ))}
     </div>
   );
 }
